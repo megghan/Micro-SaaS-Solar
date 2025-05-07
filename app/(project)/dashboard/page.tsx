@@ -1,5 +1,6 @@
 import { handleAuth } from "@/app/actions/handle-auth";
 import { auth } from "@/app/lib/auth";
+import Link from "next/dist/client/link";
 import { redirect } from "next/navigation";
 
 export default async function Deashboard() {
@@ -22,6 +23,7 @@ export default async function Deashboard() {
                     </button>
                 </form>
             )}
+            <Link href="/pagamentos">Pagamentos</Link>
         </div>
     );
 }
