@@ -25,6 +25,8 @@ export async function POST(req: NextRequest) {
 
     const metadata = {
         testeId,
+        price,
+        userId,
     };
 
 

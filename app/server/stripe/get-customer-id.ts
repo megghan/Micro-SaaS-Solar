@@ -32,6 +32,6 @@ export async function getOrCreateCustomer(userId: string, userEmail: string){
         });
     } catch (error) {
         console.error(error);
-        throw new Error("Failed to get or create custimner");
+        throw new Error("Failed to get or create customer");
     }
 }
