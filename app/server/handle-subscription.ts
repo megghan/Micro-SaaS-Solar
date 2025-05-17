@@ -1,5 +1,5 @@
 import { db } from "@/app/lib/firebase";
-import { resend } from "@/app/lib/resend";
+//import { resend } from "@/app/lib/resend";
 import "server-only";
 
 import type Stripe from "stripe";
