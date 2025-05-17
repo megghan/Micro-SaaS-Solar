@@ -1,29 +1,81 @@
-import { handleAuth } from "@/app/actions/handle-auth";
-import { auth } from "@/app/lib/auth";
-import Link from "next/dist/client/link";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
-export default async function Deashboard() {
-    const session = await auth();
+export function useStripe() {
+	const [stripe, setStripe] = useState<Stripe | null>();
 
-    if (!session) {
-        redirect("/login");
-    }
+	useEffect(() => {
+		async function loadStripeAsync() {
+			const stripeInstance = await loadStripe(
+				// biome-ignore lint/style/noNonNullAssertion: <explanation>
+				process.env.NEXT_PUBLIC_STRIPE_PUB_KEY!,
+			);
+			setStripe(stripeInstance);
+		}
 
-    return (
-        <div className="flex flex-col gap-10 items-center justify-center h-screen">
-            <h1 className="text-4xl font-bold">Protected Dashboard</h1>
-            <p>
-                {session?.user?.email ? session?.user?.email : "Usuário não está logado!"}
-            </p>
-            {session?.user?.email && (
-                <form action={handleAuth}>
-                    <button type="submit" className="border rounded-md px-2 oy-1 cursor-pointer">
-                        Logout
-                    </button>
-                </form>
-            )}
-            <Link href="/pagamentos">Pagamentos</Link>
-        </div>
-    );
+		loadStripeAsync();
+	}, []);
+
+	async function createPaymentStripeCheckout(checkoutData: {
+		testeId: string;
+	}) {
+		if (!stripe) return;
+
+		try {
+			const response = await fetch("/api/stripe/create-pay-checkout", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(checkoutData),
+			});
+
+			const data = await response.json();
+
+			await stripe.redirectToCheckout({ sessionId: data.sessionId });
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	async function createSubscriptionStripeCheckout(checkoutData: {
+		testeId: string;
+	}) {
+		if (!stripe) return;
+
+		try {
+			const response = await fetch("/api/stripe/create-subscription-checkout", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(checkoutData),
+			});
+
+			const data = await response.json();
+
+			await stripe.redirectToCheckout({ sessionId: data.sessionId });
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	async function handleCreateStripePortal() {
+		const response = await fetch("/api/stripe/create-portal", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+
+		const data = await response.json();
+
+		window.location.href = data.url;
+	}
+
+	return {
+		createPaymentStripeCheckout,
+		createSubscriptionStripeCheckout,
+		handleCreateStripePortal,
+	};
 }
