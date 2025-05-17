@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
