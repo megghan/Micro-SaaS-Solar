@@ -1,5 +1,5 @@
 import { db } from "@/app/lib/firebase";
-//import { resend } from "@/app/lib/resend";
+import { resend } from "@/app/lib/resend";
 import "server-only";
 
 import type Stripe from "stripe";
@@ -30,7 +30,7 @@ export async function handleStripePayment(
 		});
 
 		const { data, error } = await resend.emails.send({
-			from: "Acme <dev.guilhermebrasil@gmail.com>",
+			from: "Acme <jefteamb.dev>",
 			to: [userEmail],
 			subject: "Pagamento realizado com sucesso!",
 			text: "Pagamento realizado com sucesso!",

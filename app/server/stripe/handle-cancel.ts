@@ -1,5 +1,5 @@
 import { db } from "@/app/lib/firebase";
-//import { resend } from "@/app/lib/resend";
+import { resend } from "@/app/lib/resend";
 import type Stripe from "stripe";
 
 export async function handleStripeCancelSubscription(
@@ -24,7 +24,7 @@ export async function handleStripeCancelSubscription(
 	});
 
 	const { data, error } = await resend.emails.send({
-		from: "Acme <dev.guilhermebrasil@gmail.com>",
+		from: "Acme <jefteamb.dev>",
 		to: [userEmail],
 		subject: "Assinatura cancelada com sucesso!",
 		text: "Assinatura cancelada com sucesso!",
