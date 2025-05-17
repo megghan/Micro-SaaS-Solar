@@ -1,83 +1,39 @@
-"use client";
+import { handleAuth } from "@/app/actions/handle-auth";
+import { auth } from "@/app/lib/auth";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { useEffect, useState } from "react";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
+export const metadata: Metadata = {
+	title: "Micro SaaS Template - Dashboard",
+	description: "Dashboard",
+};
 
-export function useStripe() {
-	const [stripe, setStripe] = useState<Stripe | null>();
+export default async function Dashboard() {
+	// using server-side rendering to get the session
+	const session = await auth();
 
-	useEffect(() => {
-		async function loadStripeAsync() {
-			const stripeInstance = await loadStripe(
-				// biome-ignore lint/style/noNonNullAssertion: <explanation>
-				process.env.NEXT_PUBLIC_STRIPE_PUB_KEY!,
-			);
-			setStripe(stripeInstance);
-		}
-
-		loadStripeAsync();
-	}, []);
-
-	async function createPaymentStripeCheckout(checkoutData: {
-		testeId: string;
-	}) {
-		if (!stripe) return;
-
-		try {
-			const response = await fetch("/api/stripe/create-pay-checkout", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(checkoutData),
-			});
-
-			const data = await response.json();
-
-			await stripe.redirectToCheckout({ sessionId: data.sessionId });
-		} catch (e) {
-			console.error(e);
-		}
+	if (!session) {
+		redirect("/login");
 	}
 
-	async function createSubscriptionStripeCheckout(checkoutData: {
-		testeId: string;
-	}) {
-		if (!stripe) return;
-
-		try {
-			const response = await fetch("/api/stripe/create-subscription-checkout", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(checkoutData),
-			});
-
-			const data = await response.json();
-
-			await stripe.redirectToCheckout({ sessionId: data.sessionId });
-		} catch (e) {
-			console.error(e);
-		}
-	}
-
-	async function handleCreateStripePortal() {
-		const response = await fetch("/api/stripe/create-portal", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-
-		const data = await response.json();
-
-		window.location.href = data.url;
-	}
-
-	return {
-		createPaymentStripeCheckout,
-		createSubscriptionStripeCheckout,
-		handleCreateStripePortal,
-	};
+	return (
+		<div className="flex flex-col gap-10 items-center justify-center h-screen">
+			<h1 className="text-4xl font-bold">Protected Dashboard</h1>
+			<p>
+				{session?.user?.email ? session?.user?.email : "User not authenticated"}
+			</p>
+			{session.user?.email && (
+				<form action={handleAuth}>
+					<button
+						type="submit"
+						className="border rounded-md px-2 hover:cursor-pointer"
+					>
+						Logout
+					</button>
+				</form>
+			)}
+			<Link href="/payments">Payments</Link>
+		</div>
+	);
 }
