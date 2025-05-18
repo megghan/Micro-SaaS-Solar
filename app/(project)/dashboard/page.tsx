@@ -33,7 +33,7 @@ export default async function Dashboard() {
 					</button>
 				</form>
 			)}
-			<Link href="/payments">Payments</Link>
+			<Link href="/pagamentos">Payments</Link>
 		</div>
 	);
 }
