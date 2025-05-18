@@ -13,7 +13,7 @@ export default function Payments() {
 
 	return (
 		<div className="flex h-screen w-full items-center justify-center flex-col gap-5">
-			<h1 className="text-3xl font-bold">Payments</h1>
+			<h1 className="text-3xl font-bold">Pagamentos</h1>
 			<button
 				className="border rounded-md px-1"
 				type="button"
